@@ -64,4 +64,7 @@ WORKDIR /var/www
 EXPOSE 80
 EXPOSE 443
 
-CMD ["/usr/sbin/apache2ctl", "-D", "FOREGROUND"]
+COPY start-apache.sh /opt/start-apache.sh
+RUN chmod +x /opt/start-apache.sh
+
+CMD ["/opt/start-apache.sh"]
