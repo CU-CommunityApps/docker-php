@@ -59,8 +59,6 @@ RUN buildDeps=" \
 COPY docker-php-ext-* /usr/local/bin/
 COPY test.php /var/www/test.php
 
-COPY https.kfs-updev.adminapps.cornell.edu.keytab /infra/https.kfs-updev.adminapps.cornell.edu.keytab
-
 WORKDIR /var/www
 
 EXPOSE 80
