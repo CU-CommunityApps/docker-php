@@ -26,13 +26,19 @@ RUN buildDeps=" \
 		$PHP_EXTRA_BUILD_DEPS \
 		bzip2 \
 		file \
+		libmcrypt4 \
 		libcurl4-openssl-dev \
 		libreadline6-dev \
 		libssl-dev \
 		libxml2-dev \
+		libmcrypt-dev \
+		libldap2-dev \
+		libsasl2-dev \
 	"; \
 	set -x \
 	&& apt-get update && apt-get install -y $buildDeps --no-install-recommends && rm -rf /var/lib/apt/lists/* \
+	&& ln -s /usr/lib/x86_64-linux-gnu/libldap.so /usr/lib/libldap.so \
+	&& ln -s /usr/lib/x86_64-linux-gnu/liblber.so /usr/lib/liblber.so \
 	&& curl -SL "http://php.net/get/php-$PHP_VERSION.tar.bz2/from/this/mirror" -o php.tar.bz2 \
 	&& curl -SL "http://php.net/get/php-$PHP_VERSION.tar.bz2.asc/from/this/mirror" -o php.tar.bz2.asc \
 #	&& gpg --verify php.tar.bz2.asc \
@@ -46,14 +52,23 @@ RUN buildDeps=" \
 		$PHP_EXTRA_CONFIGURE_ARGS \
 		--disable-cgi \
 		--enable-mysqlnd \
+		--enable-mbstring \
 		--with-curl \
 		--with-openssl \
 		--with-readline \
 		--with-zlib \
+		--with-mcrypt=static \
+		--with-ldap \
+		--with-ldap-sasl \
+    --with-mysql=mysqlnd \
+    --with-mysqli=mysqlnd \
+    --with-pdo-mysql=mysqlnd \
 	&& make -j"$(nproc)" \
 	&& make install \
+	&& cp /usr/src/php/php.ini-production /usr/local/etc/php/php.ini \
+	&& cp /usr/src/php/libs/libphp5.so /usr/lib/apache2/modules \ 
 	&& { find /usr/local/bin /usr/local/sbin -type f -executable -exec strip --strip-all '{}' + || true; } \
-	&& apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false -o APT::AutoRemove::SuggestsImportant=false $buildDeps \
+#	&& apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false -o APT::AutoRemove::SuggestsImportant=false $buildDeps \
 	&& make clean
 
 COPY docker-php-ext-* /usr/local/bin/
