@@ -1,4 +1,4 @@
-FROM docker.cucloud.net/apache22
+FROM dtr.cucloud.net/cs/apache22
 
 # persistent / runtime deps
 RUN apt-get update && apt-get install -y ca-certificates curl libxml2 --no-install-recommends && rm -r /var/lib/apt/lists/*
@@ -13,7 +13,7 @@ RUN mkdir -p $PHP_INI_DIR/conf.d
 #COPY apache2.conf /etc/apache2/apache2.conf
 # it'd be nice if we could not COPY apache2.conf until the end of the Dockerfile, but its contents are checked by PHP during compilation
 
-ENV PHP_EXTRA_BUILD_DEPS apache2-dev 
+ENV PHP_EXTRA_BUILD_DEPS apache2-dev
 #apache2-prefork-dev
 ENV PHP_EXTRA_CONFIGURE_ARGS --with-apxs2=/usr/bin/apxs2
 
@@ -66,7 +66,7 @@ RUN buildDeps=" \
 	&& make -j"$(nproc)" \
 	&& make install \
 	&& cp /usr/src/php/php.ini-production /usr/local/etc/php/php.ini \
-	&& cp /usr/src/php/libs/libphp5.so /usr/lib/apache2/modules \ 
+	&& cp /usr/src/php/libs/libphp5.so /usr/lib/apache2/modules \
 	&& { find /usr/local/bin /usr/local/sbin -type f -executable -exec strip --strip-all '{}' + || true; } \
 #	&& apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false -o APT::AutoRemove::SuggestsImportant=false $buildDeps \
 	&& make clean
